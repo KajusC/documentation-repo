@@ -21,6 +21,8 @@ Feature: clear every line for a user after a successful checkout or an explicit 
 
 Redis keeps the key as an empty cart. Spanner and AlloyDB delete rows. See [Cart storage](../../cart-storage/index.md).
 
+Note that the `Cart` message includes `user_id`, `items`, and `expires_at` (`int64`).
+
 ## Architecture
 
 `CartService.EmptyCart`:
