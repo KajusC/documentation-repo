@@ -1,0 +1,12 @@
+[project]
+name = "documentation-repo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "genai>=2.1.0",
+    "pygithub>=2.10.0",
+    "tree-sitter>=0.26.0",
+    "tree-sitter-c-sharp>=0.23.5",
+]
