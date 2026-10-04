@@ -16,6 +16,7 @@ Store one `Cart` message per user.
 | Name | Role |
 | --- | --- |
 | `REDIS_ADDR` | Host:port (cluster default `redis-cart:6379`) |
+| `CART_PERSIST_DAYS` | Cart expiration time in days (default `30`) |
 | Cache key | `userId` |
 | Value | `cart.ToByteArray()` / `Cart.Parser.ParseFrom` |
 
@@ -23,9 +24,9 @@ Store one `Cart` message per user.
 
 ## Architecture
 
-`_cache` is `IDistributedCache`.
+`_cache` is `IDistributedCache`. Cart TTL is determined by `CART_PERSIST_DAYS` (default 30 days).
 
-1. **Add.** Load or create cart → merge quantity by `productId` (`SingleOrDefault`) → `SetAsync(userId, cart.ToByteArray())`.
+1. **Add.** Load or create cart → merge quantity by `productId` (`SingleOrDefault`) → set `ExpiresAt` → `SetAsync(userId, cart.ToByteArray())` with absolute expiration relative to now.
 2. **Get.** Load bytes; parse or return `new Cart()`.
 3. **Empty.** `SetAsync(userId, new Cart().ToByteArray())`.
 4. **Ping.** `return true`.

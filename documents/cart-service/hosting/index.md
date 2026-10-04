@@ -88,7 +88,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
 - Image built from `src/cartservice/src/Dockerfile`: SDK publish (single-file, trimmed) onto `dotnet/runtime-deps` chiseled, user `1000`.
 - Kubernetes `Deployment` + `Service` (`ClusterIP`, port `7070`) + `ServiceAccount` in `kubernetes-manifests/cartservice.yaml`.
-- Environment variables in deployment include `REDIS_ADDR`.
+- Environment variables in deployment include `REDIS_ADDR` and `CART_PERSIST_DAYS`.
 - Requests `200m` CPU / `64Mi`; limits `300m` / `128Mi`.
 - Default cluster backend is in-cluster Redis; see [Redis store](../cart-storage/redis/index.md).
 
