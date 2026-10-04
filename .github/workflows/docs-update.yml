@@ -1,0 +1,44 @@
+name: Docs update
+
+on:
+  workflow_dispatch:
+    inputs:
+      code_repo:
+        description: Code repo that has the PR
+        required: true
+      pr_number:
+        description: PR number in the code repo
+        required: true
+
+concurrency:
+  group: docs-${{ inputs.code_repo }}-${{ inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.DOCS_BOT_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      CODEBASE_REPO_PATH: ${{ inputs.code_repo }}
+      DOCUMENTATION_REPO_PATH: ${{ github.repository }}
+      PR_NUMBER: ${{ inputs.pr_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - run: uv sync --frozen
+
+      - name: Run pipeline
+        working-directory: code
+        run: uv run python -m src.main.run
+
+      - name: Tell the PR it failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_BOT_TOKEN }}
+        run: |
+          gh pr comment ${{ inputs.pr_number }} --repo ${{ inputs.code_repo }} \
+            --body "Docs update failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
