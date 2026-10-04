@@ -26,7 +26,7 @@ Defined in `src/cartservice/src/protos/Cart.proto`:
 | RPC | Request | Response |
 | --- | --- | --- |
 | `AddItem` | `user_id`, `CartItem` (`product_id`, `quantity`) | `Empty` |
-| `GetCart` | `user_id` | `Cart` (`user_id`, `items`) |
+| `GetCart` | `user_id` | `Cart` (`user_id`, `items`, `expires_at`) |
 | `EmptyCart` | `user_id` | `Empty` |
 
 Internal store contract (`ICartStore`): `AddItemAsync`, `GetCartAsync`, `EmptyCartAsync`, `Ping`. See [Cart storage](cart-storage/index.md).
