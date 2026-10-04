@@ -54,10 +54,6 @@ livenessProbe:
     port: 7070
 ```
 
-Environment variables configured in deployment:
-- `REDIS_ADDR`: Address of the Redis cart instance.
-- `CART_PERSIST_DAYS`: Number of days to persist cart data (value set to `7`).
-
 ## Sources
 
 - `src/cartservice/src/services/HealthCheckService.cs`

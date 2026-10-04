@@ -26,7 +26,7 @@ Defined in `src/cartservice/src/protos/Cart.proto`:
 | RPC | Request | Response |
 | --- | --- | --- |
 | `AddItem` | `user_id`, `CartItem` (`product_id`, `quantity`) | `Empty` |
-| `GetCart` | `user_id` | `Cart` (`user_id`, `items`, `expires_at`) |
+| `GetCart` | `user_id` | `Cart` (`user_id`, `items`) |
 | `EmptyCart` | `user_id` | `Empty` |
 
 Internal store contract (`ICartStore`): `AddItemAsync`, `GetCartAsync`, `EmptyCartAsync`, `Ping`. See [Cart storage](cart-storage/index.md).
@@ -47,8 +47,7 @@ HTTP `GET /` returns a plaintext reminder that clients must use gRPC.
 1. Host entry is `Program.cs`: `Host.CreateDefaultBuilder` + `UseStartup<Startup>`.
 2. With no backend env vars the process uses an in-memory cache behind `RedisCartStore`. See [Hosting](hosting/index.md).
 3. Container listens on `7070` (`ASPNETCORE_HTTP_PORTS=7070`, `EXPOSE 7070`).
-4. Environment variables include `CART_PERSIST_DAYS` (set to `7` in the manifest).
-5. Tests: `src/cartservice/tests/CartServiceTests.cs` via `TestServer` + a gRPC client.
+4. Tests: `src/cartservice/tests/CartServiceTests.cs` via `TestServer` + a gRPC client.
 
 ```bash
 # from src/cartservice

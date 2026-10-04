@@ -19,7 +19,6 @@ Feature: append a product to a user's cart, or increase quantity if that product
 | Request | `user_id: string`, `item: CartItem { product_id, quantity }` |
 | Store | `Task AddItemAsync(string userId, string productId, int quantity)` |
 | Errors | Stores throw `RpcException` (`FailedPrecondition`) when storage fails |
-| Cart Proto | `user_id: string`, `items: repeated CartItem`, `expires_at: int64` |
 
 ## Architecture
 

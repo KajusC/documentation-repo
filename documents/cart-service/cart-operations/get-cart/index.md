@@ -17,7 +17,7 @@ Used by the storefront to render the bag and by checkout to snapshot lines befor
 | --- | --- |
 | RPC | `GetCart(GetCartRequest) returns (Cart)` |
 | Request | `user_id: string` |
-| Response | `Cart { user_id, repeated CartItem items, int64 expires_at }` |
+| Response | `Cart { user_id, repeated CartItem items }` |
 | Store | `Task<Hipstershop.Cart> GetCartAsync(string userId)` |
 
 ## Architecture
