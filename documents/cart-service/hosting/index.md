@@ -25,7 +25,7 @@ Store-selection env vars live under [Cart storage](../cart-storage/index.md).
 Program.cs
   CreateHostBuilder → UseStartup<Startup>
         │
-        ├─ ConfigureServices  (pick ICartStore, AddGrpc)
+        ├─ ConfigureServices  (pick ICartStore, AddGrpc, TryAddScoped CartValidator)
         └─ Configure          (MapGrpcService ×2, MapGet /)
 ```
 
@@ -37,7 +37,7 @@ Program.cs
 2. Else `SPANNER_PROJECT` or `SPANNER_CONNECTION_STRING` → `SpannerCartStore`.
 3. Else `ALLOYDB_PRIMARY_IP` → log `Creating AlloyDB cart store`, `AlloyDBCartStore`.
 4. Else log in-memory fallback, `AddDistributedMemoryCache` + `RedisCartStore`.
-5. Always `AddGrpc()`.
+5. Always `AddGrpc()` and register `ICartValidator` as scoped (`TryAddScoped<ICartValidator, CartValidator>()`).
 
 **Configure:**
 
@@ -69,6 +69,10 @@ else
     services.AddDistributedMemoryCache();
     services.AddSingleton<ICartStore, RedisCartStore>();
 }
+
+
+services.AddGrpc();
+services.TryAddScoped<ICartValidator, CartValidator>();
 ```
 
 `src/cartservice/src/Startup.cs`.

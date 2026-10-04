@@ -4,12 +4,12 @@ Feature: append a product to a user's cart, or increase quantity if that product
 
 ## Purpose
 
-`AddItem` is how the storefront puts a SKU in the cart. The RPC only forwards; each store merges quantity.
+`AddItem` is how the storefront puts a SKU in the cart. The request is validated before the store merges quantity.
 
 ## Who calls / is called by
 
 - **Called by:** `frontend.insertCart` → `CartService.AddItem`. Checkout does not add items.
-- **Calls:** `_cartStore.AddItemAsync(userId, productId, quantity)`.
+- **Calls:** `_cartValidator.ValidateCartInput(request)`, `_cartStore.AddItemAsync(userId, productId, quantity)`.
 
 ## Interfaces
 
@@ -18,19 +18,32 @@ Feature: append a product to a user's cart, or increase quantity if that product
 | RPC | `AddItem(AddItemRequest) returns (Empty)` |
 | Request | `user_id: string`, `item: CartItem { product_id, quantity }` |
 | Store | `Task AddItemAsync(string userId, string productId, int quantity)` |
-| Errors | Stores throw `RpcException` (`FailedPrecondition`) when storage fails |
+| Validator | `Task<bool> ValidateCartInput(AddItemRequest request)` |
+| Errors | Throws `RpcException` (`InvalidArgument`) when validation fails; stores throw `RpcException` (`FailedPrecondition`) when storage fails |
 
 ## Architecture
 
 `CartService.AddItem`:
 
-1. Read `request.UserId`, `request.Item.ProductId`, `request.Item.Quantity`.
-2. `await _cartStore.AddItemAsync(...)`.
-3. Return the static `Empty` instance.
+1. Validate the request via `_cartValidator.ValidateCartInput(request)`. If invalid, throw an `RpcException` with `StatusCode.InvalidArgument`.
+2. Read `request.UserId`, `request.Item.ProductId`, `request.Item.Quantity`.
+3. `await _cartStore.AddItemAsync(...)`.
+4. Return the static `Empty` instance.
 
 ```csharp
+public CartService(ICartStore cartStore, ICartValidator cartValidator)
+{
+    _cartStore = cartStore;
+    _cartValidator = cartValidator;
+}
+
 public async override Task<Empty> AddItem(AddItemRequest request, ServerCallContext context)
 {
+    if (!await _cartValidator.ValidateCartInput(request))
+    {
+        throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid cart request"));
+    }
+
     await _cartStore.AddItemAsync(request.UserId, request.Item.ProductId, request.Item.Quantity);
     return Empty;
 }
