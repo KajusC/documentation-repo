@@ -1,3 +1,4 @@
+import time
 from typing import Literal
 
 from google import genai
@@ -29,18 +30,32 @@ class Topic(BaseModel):
 
 
 def ask(system_prompt, schema, text):
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=text,
-        config={
-            "system_instruction": system_prompt,
-            "temperature": 1,
-            "response_mime_type": "application/json",
-            "response_schema": schema,
-            "thinking_config": {"thinking_level": "MEDIUM"},
-        },
-    )
-    return response.parsed
+
+    try_count = 0
+    max_tries = 3
+
+    while try_count < max_tries:
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=text,
+                config={
+                    "system_instruction": system_prompt,
+                    "temperature": 1,
+                    "response_mime_type": "application/json",
+                    "response_schema": schema,
+                    "thinking_config": {"thinking_level": "MEDIUM"},
+                },
+            )
+            return response.parsed
+        except Exception as e:
+            print(
+                f"Error asking: {e} (attempt {try_count + 1} of {max_tries})",
+                flush=True,
+            )
+            try_count += 1
+            time.sleep(10)
+    return None
 
 
 def new_pages(change):
